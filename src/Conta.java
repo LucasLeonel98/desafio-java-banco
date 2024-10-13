@@ -8,16 +8,32 @@ public abstract class Conta implements IConta {
 	protected int numero;
 	protected double saldo;
 	protected Cliente cliente;
+	protected Banco banco;
 
-	public Conta(Cliente cliente) {
+	public Conta(Cliente cliente, Banco banco) {
 		this.agencia = Conta.AGENCIA_PADRAO;
 		this.numero = SEQUENCIAL++;
 		this.cliente = cliente;
+		this.banco = banco;
+		
+		banco.setContas(this);
 	}
 
 	@Override
-	public void sacar(double valor) {
-		saldo -= valor;
+	public boolean sacar(double valor) {
+		if (valor > 0 ) {
+			if (this.saldo >= valor) {
+				
+				saldo -= valor;
+				return true;
+			}else {
+				System.out.println("Sem saldo para esta operação !");
+				return false;
+			}
+		}else {
+			System.out.println("valor de saque inválido !");
+			return false;
+		}
 	}
 
 	@Override
@@ -27,8 +43,9 @@ public abstract class Conta implements IConta {
 
 	@Override
 	public void transferir(double valor, IConta contaDestino) {
-		this.sacar(valor);
-		contaDestino.depositar(valor);
+		if(this.sacar(valor)) {
+			contaDestino.depositar(valor);
+		}
 	}
 
 	public int getAgencia() {
